@@ -48,14 +48,14 @@ def is_between_quotes(region, view):
     if not match:
         return False
 
-    return string.find(match.group(0), segment) > -1
+    return match.group(0) in segment
 
 
-class CoffeeCleanCommand(sublime_plugin.EventListener):
+class CoffeeCleanCommand(sublime_plugin.TextCommand):
 
-    def on_pre_save(self, view):
+    def run(self, edit):
+        view = self.view
         if len(view.file_name()) > 0 and view.file_name().endswith((".coffee")):
-            edit = view.begin_edit()
 
             for replacement in replacements:
                 find = replacement[0]
@@ -68,4 +68,8 @@ class CoffeeCleanCommand(sublime_plugin.EventListener):
                         if not is_between_quotes(region, view):
                             view.replace(edit, region, replace)
 
-            view.end_edit(edit)
+
+class CoffeeCleanOnSaveCommand(sublime_plugin.EventListener):
+
+    def on_pre_save(self, view):
+        view.window().run_command('coffee_clean')

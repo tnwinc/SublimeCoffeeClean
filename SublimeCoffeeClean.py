@@ -2,7 +2,7 @@ import sublime_plugin
 import string
 import re
 
-part_in_quotes = re.compile(r"([\"'])(?:\\\1|.)*?\1")
+IN_QUOTES_REGEX = re.compile(r"([\"'])(?:\\\1|.)*?\1")
 
 replacements = [
     # missing spaces
@@ -43,12 +43,12 @@ replacements = [
 def is_between_quotes(region, view):
     segment = view.substr(region)
     line = view.substr(view.line(region))
-    match = re.search(part_in_quotes, line)
+    quoted_parts_on_line = re.search(IN_QUOTES_REGEX, line)
 
-    if not match:
+    if not quoted_parts_on_line:
         return False
 
-    return match.group(0) in segment
+    return segment in quoted_parts_on_line.group(0)
 
 
 class CoffeeCleanCommand(sublime_plugin.TextCommand):

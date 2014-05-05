@@ -1,3 +1,4 @@
+import sublime
 import sublime_plugin
 import string
 import re
@@ -42,14 +43,15 @@ replacements = [
 
 def is_between_quotes(region, view):
     segment = view.substr(region)
-    line = view.substr(view.line(region))
+    line_region = view.line(region)
+    line = view.substr(line_region)
     quoted_parts_on_line = re.search(IN_QUOTES_REGEX, line)
 
     if not quoted_parts_on_line:
         return False
 
-    return segment in quoted_parts_on_line.group(0)
-
+    quoted_region = view.find(quoted_parts_on_line.group(0), line_region.begin(), sublime.LITERAL)
+    return quoted_region.contains(region)
 
 class CoffeeCleanCommand(sublime_plugin.TextCommand):
 
